@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Set this to your real navbar height – the hero fills exactly the space below it */
+:root { --nav-h: 72px; }
+
+html { scroll-behavior: smooth; }
+body { @apply font-sans text-ink antialiased bg-white overflow-x-hidden; }
+:focus-visible { outline: 2px solid #0095FF; outline-offset: 3px; border-radius: 8px; }
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-[100px]; }
+  .pill-tag { @apply inline-flex items-center rounded-full text-[11px] font-medium px-2.5 py-1 leading-none; }
+  .section-bg { background: linear-gradient(180deg,#f8faff 0%,#f6f7fe 100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* ───────── Hero cards: smooth animated gradient border on hover ───────── */
+@property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes spinAng { to { --ang: 360deg; } }
+
+.choice-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;                 /* sits exactly on the 2px border */
+  padding: 2px;                /* ring thickness */
+  border-radius: inherit;
+  background: conic-gradient(from var(--ang), #0095FF, #06B79C, #8B5CF6, #0095FF);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask-composite: exclude;
+  opacity: 0;
+  transform: scale(.985);
+  transition: opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+  animation: spinAng 3.2s linear infinite;
+  animation-play-state: paused;
+  pointer-events: none;
+  z-index: 20;
+}
+.choice-card:hover::before,
+.choice-card:focus-within::before {
+  opacity: 1;
+  transform: scale(1);
+  animation-play-state: running;
+}
+
+/* ───────── Sign Up button (add class="btn-signup") ───────── */
+.btn-signup {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background-image: linear-gradient(110deg, #0095FF 0%, #0077E6 50%, #06B79C 100%);
+  background-size: 200% 100%;
+  background-position: 0% 0;
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background-position .5s ease;
+}
+.btn-signup::before {            /* shimmer sweep */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform .7s ease;
+}
+.btn-signup::after {             /* click pulse */
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 10px; height: 10px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,.6);
+  transform: translate(-50%,-50%) scale(0);
+  opacity: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.btn-signup:hover {
+  transform: translateY(-2px);
+  background-position: 100% 0;
+  box-shadow: 0 10px 24px -8px rgba(0,149,255,.6);
+}
+.btn-signup:hover::before { transform: translateX(120%); }
+.btn-signup:active {
+  transform: translateY(0) scale(.95);
+  box-shadow: 0 3px 8px -3px rgba(0,149,255,.55);
+  transition-duration: .1s;
+}
+.btn-signup:active::after { animation: btnPulse .5s ease-out; }
+@keyframes btnPulse {
+  0%   { transform: translate(-50%,-50%) scale(0);  opacity: .8; }
+  100% { transform: translate(-50%,-50%) scale(14); opacity: 0; }
+}
+
+/* ───────── Sign In link/button (add class="btn-signin") ───────── */
+.btn-signin {
+  position: relative;
+  border-radius: 9999px;
+  transition: color .25s ease, background-color .25s ease, transform .2s cubic-bezier(.2,.8,.2,1);
+}
+.btn-signin::after {             /* underline grows from centre */
+  content: '';
+  position: absolute;
+  left: 50%; bottom: 2px;
+  height: 2px; width: 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #0095FF, #06B79C);
+  transform: translateX(-50%);
+  transition: width .3s cubic-bezier(.2,.8,.2,1);
+}
+.btn-signin:hover { color: #0095FF; background-color: rgba(0,149,255,.07); transform: translateY(-1px); }
+.btn-signin:hover::after { width: 55%; }
+.btn-signin:active { transform: scale(.94); background-color: rgba(0,149,255,.14); transition-duration: .1s; }

@@ -1,9 +1,8 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PHONES } from './data';
 import Reveal from './ui/Reveal';
 
-/* per-offset layout: scale, translateX (% of the phone's own width), z-index */
 const POS = {
   '-2': { s: 0.67, x: -178, z: 1 },
   '-1': { s: 0.79, x: -95, z: 2 },
@@ -12,16 +11,10 @@ const POS = {
   2: { s: 0.67, x: 178, z: 1 },
 };
 
-/* blur (px) applied ONLY to the screen content of a phone, by distance from the centre */
 const BLUR = [0, 1.5, 2.5];
-
-/* The screen area inside the phone frame, as % of the phone image.
-   The blurred copy is clipped to this shape so the frame itself stays sharp.
-   If the edge looks slightly off on your images, nudge these numbers. */
 const SCREEN_CLIP = 'inset(1.5% 3.6% 1.7% 3.6% round 11% / 5.2%)';
-
-/* phone width scales with the viewport: 150px on phones → 275px on desktop */
 const PHONE_W = 'clamp(150px, 26vw, 275px)';
+const AUTOPLAY_MS = 3000;
 
 export default function AppShowcase() {
   const [active, setActive] = useState(2);
@@ -33,9 +26,18 @@ export default function AppShowcase() {
     if (e.key === 'ArrowLeft') go(active - 1);
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const id = setInterval(() => {
+      setActive((a) => (a + 1) % PHONES.length);
+    }, AUTOPLAY_MS);
+    return () => clearInterval(id);
+  }, [active]);
+
   return (
     <section id="app" className="relative overflow-hidden bg-white pb-16 pt-10">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-20 -z-0 mx-auto h-[420px] max-w-[1100px] rounded-full bg-[radial-gradient(ellipse,rgba(191,219,254,.45),transparent_70%)]" />
+      <div aria-hidden className="bg-aurora-soft pointer-events-none absolute inset-x-0 top-20 -z-0 mx-auto h-[420px] max-w-[1100px] rounded-full" />
 
       <div className="container-x relative text-center">
         <Reveal>
@@ -74,27 +76,27 @@ export default function AppShowcase() {
                   onClick={() => go(i)}
                   aria-label={`Show screen ${i + 1}`}
                   aria-current={off === 0}
-                  className={`group absolute left-1/2 top-1/2 origin-center rounded-[2rem] transition-[transform,opacity] duration-500 ease-out focus-visible:ring-2 focus-visible:ring-brand ${
+                  className={`group absolute left-1/2 top-1/2 origin-center rounded-[2rem] transition-[transform,opacity] duration-700 ease-[cubic-bezier(.22,1,.36,1)] will-change-transform focus-visible:ring-2 focus-visible:ring-brand hover:[--hoverY:-10px] hover:[--hoverS:1.05] focus-visible:[--hoverY:-10px] focus-visible:[--hoverS:1.05] active:[--hoverS:0.97] ${
                     dist === 2 ? 'max-xl:hidden' : ''
                   } ${hiddenFar ? 'pointer-events-none opacity-0' : ''}`}
                   style={{
                     width: PHONE_W,
-                    transform: `translate(-50%,-50%) translateX(${p.x}%) scale(${p.s})`,
+                    // base carousel position/scale composed with hover-only CSS vars
+                    // (--hoverY / --hoverS), which the Tailwind classes above set on
+                    // hover/focus — gives each phone a real "lift + zoom" on hover
+                    // instead of the previous static, non-interactive state.
+                    transform: `translate(-50%,-50%) translateX(${p.x}%) scale(${p.s}) translateY(var(--hoverY,0px)) scale(var(--hoverS,1))`,
                     zIndex: p.z,
                     opacity: hiddenFar ? 0 : dist === 2 ? 0.9 : 1,
                     '--b': `${blur}px`,
                   }}
                 >
-                  {/* 1) sharp phone – frame + screen */}
                   <img
                     src={src}
                     alt={`CampusPe app screen ${i + 1}`}
                     draggable={false}
                     className="block w-full drop-shadow-[0_20px_30px_rgba(15,23,42,.25)]"
                   />
-
-                  {/* 2) blurred copy clipped to the SCREEN only – frame stays crisp.
-                         Fades out when the phone reaches the centre so its content becomes fully visible. */}
                   <img
                     src={src}
                     alt=""

@@ -10,17 +10,17 @@ const base =
 const variants = {
   primary:
     'bg-brand text-white shadow-[0_4px_14px_-4px_rgba(0,149,255,.55)] ' +
-    'hover:bg-brand-dark hover:-translate-y-[2px] hover:shadow-[0_12px_26px_-8px_rgba(0,149,255,.6)] ' +
-    'group-hover:[&_svg]:translate-x-[3px] active:bg-brand-darker active:shadow-[0_4px_10px_-4px_rgba(0,149,255,.5)]',
+    'hover:bg-brand-dark hover:-translate-y-[2px] hover:scale-[1.035] hover:shadow-[0_12px_26px_-8px_rgba(0,149,255,.6)] ' +
+    'group-hover:[&_svg]:translate-x-[3px] active:bg-brand-darker active:scale-[.96] active:shadow-[0_4px_10px_-4px_rgba(0,149,255,.5)]',
   outline:
     'bg-white text-brand border border-brand/70 ' +
-    'hover:bg-brand hover:text-white hover:border-brand hover:-translate-y-[2px] hover:shadow-[0_10px_24px_-10px_rgba(0,149,255,.55)] ' +
+    'hover:bg-brand hover:text-white hover:border-brand hover:-translate-y-[2px] hover:scale-[1.035] hover:shadow-[0_10px_24px_-10px_rgba(0,149,255,.55)] ' +
     'group-hover:[&_svg]:translate-x-[3px]',
   ghost:
     'bg-white text-ink border border-slate-200 ' +
-    'hover:border-brand/60 hover:text-brand hover:-translate-y-[2px] hover:shadow-soft ' +
+    'hover:border-brand/60 hover:text-brand hover:-translate-y-[2px] hover:scale-[1.03] hover:shadow-soft ' +
     'group-hover:[&_svg]:translate-x-[3px]',
-  text: 'text-ink hover:text-brand group-hover:[&_svg]:translate-x-[3px]',
+  text: 'text-ink hover:text-brand hover:scale-[1.03] group-hover:[&_svg]:translate-x-[3px]',
 };
 const sizes = {
   sm: 'h-9 px-4 text-[13px] rounded-lg',

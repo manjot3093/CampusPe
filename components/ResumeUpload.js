@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { ArrowUp, Check, FileText, Loader2, Lock, X, Zap } from 'lucide-react';
 
@@ -24,6 +24,15 @@ const STEP_LABELS = [
   'Weighing your experience…',
   'Searching 1,000+ sources…',
 ];
+
+/* soft coloured wash: sky-blue bottom-left, lavender right, faint indigo glow behind the heading */
+const WASH = {
+  background: [
+    'radial-gradient(ellipse 34% 42% at 10% 72%, rgba(125,211,252,.30), transparent 70%)',
+    'radial-gradient(ellipse 34% 42% at 90% 58%, rgba(196,181,253,.30), transparent 70%)',
+    'radial-gradient(ellipse 40% 26% at 50% 6%, rgba(199,210,254,.32), transparent 70%)',
+  ].join(','),
+};
 
 /* count-up number, starts when `run` becomes true */
 function useCountUp(target, run, ms = 1400) {
@@ -109,13 +118,13 @@ export default function ResumeUpload() {
     <section
       ref={sectionRef}
       id="upload"
-      className="section-frame relative flex scroll-mt-[var(--nav-h,80px)] flex-col justify-center overflow-x-clip bg-gradient-to-br from-[#f4f6ff] via-[#f8faff] to-[#f6efff] py-[clamp(16px,3vh,40px)] lg:min-h-[calc(100svh-var(--nav-h,80px))]"
+      className="section-frame relative flex scroll-mt-[var(--nav-h,80px)] flex-col justify-center overflow-x-clip bg-gradient-to-b from-[#f6f8ff] to-[#f8f6ff] py-[clamp(16px,3vh,40px)] lg:min-h-[calc(100svh-var(--nav-h,80px))]"
     >
-      {/* background glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_55%,rgba(186,230,253,.45),transparent_32%),radial-gradient(circle_at_84%_55%,rgba(233,213,255,.5),transparent_34%)]"
-      />
+      {/* background glow layers */}
+      <div aria-hidden="true" className="bg-aurora pointer-events-none absolute inset-0" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={WASH} />
+      {/* faint ring behind the heading */}
+      <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[-160px] hidden h-[420px] w-[min(1000px,110%)] -translate-x-1/2 rounded-[100%] border border-indigo-100/70 sm:block" />
 
       <div className="container-x relative mx-auto flex w-full flex-col">
         {/* ───────── header ───────── */}
@@ -126,23 +135,23 @@ export default function ResumeUpload() {
           transition={{ duration: 0.6, ease: EASE }}
           className="shrink-0 text-center"
         >
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1 text-[10px] shadow-soft sm:px-4 sm:text-[11px]">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-70" />
-              <span className="relative h-2 w-2 rounded-full bg-indigo-500" />
+          <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-[#f4f2ff] px-3.5 py-1 text-[10px] shadow-soft sm:px-4 sm:text-[11px]">
+            <span className="relative grid h-3 w-3 place-items-center rounded-full bg-indigo-100">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-300 opacity-60" />
+              <span className="relative h-1.5 w-1.5 rounded-full bg-indigo-500" />
             </span>
-            <b className="font-semibold uppercase tracking-wide text-brand">Try it live</b>
+            <b className="font-medium uppercase tracking-wide text-brand">Try it live</b>
             <span className="text-slate-300">|</span>
-            <span className="text-slate-500">v2.4 AI Engine</span>
+            <span className="text-slate-400">v2.4 AI Engine</span>
           </span>
 
-          <h2 className="mx-auto mt-[clamp(8px,1.8vh,18px)] max-w-[760px] font-display text-[clamp(28px,5.4vh,49px)] font-bold leading-[1.04] tracking-tight text-[#0B1020]">
+          <h2 className="mx-auto mt-[clamp(8px,1.8vh,16px)] max-w-[760px] font-display text-[clamp(26px,5vh,40px)] font-bold leading-[1.12] tracking-tight text-[#0B1020]">
             Upload your resume.
             <br />
-            <span className="bg-gradient-to-r from-[#0095FF] to-[#06B79C] bg-clip-text text-transparent">Find jobs that fit.</span>
+            <span className="text-brand">Find jobs that fit.</span>
           </h2>
 
-          <p className="mx-auto mt-[clamp(6px,1.4vh,14px)] max-w-[700px] text-[clamp(13px,2.1vh,17px)] leading-[1.45] text-slate-600">
+          <p className="mx-auto mt-[clamp(6px,1.4vh,12px)] max-w-[560px] text-[clamp(13px,2vh,16px)] leading-[1.5] text-slate-600">
             Upload once. CampusPe reads your skills, experience, and preferences — then finds relevant jobs across 1,000+ sources.
           </p>
         </motion.div>
@@ -153,21 +162,21 @@ export default function ResumeUpload() {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.65, delay: 0.06, ease: EASE }}
-          className="relative mx-auto mt-[clamp(10px,2.2vh,24px)] w-full max-w-[680px]"
+          className="relative mx-auto mt-[clamp(14px,2.8vh,28px)] w-full max-w-[420px]"
         >
           {/* match-rate card (count-up) */}
           <motion.div
             animate={{ y: [0, -4, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
             whileHover={{ scale: 1.06 }}
-            className="absolute left-2 top-3 z-20 hidden cursor-default items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2 text-left shadow-soft sm:flex md:-left-8 lg:-left-10"
+            className="absolute top-8 z-20 hidden cursor-default items-center gap-2 rounded-xl border border-slate-100 bg-white px-2.5 py-1.5 text-left shadow-soft sm:-left-10 sm:flex"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-lg border border-lime-200 bg-lime-50 text-lime-600">
-              <Zap size={13} />
+            <span className="grid h-7 w-7 place-items-center rounded-lg border border-lime-200 bg-lime-50 text-lime-600">
+              <Zap size={12} />
             </span>
             <div>
-              <p className="text-[11px] font-semibold leading-tight tabular-nums">{match}% Match Rate</p>
-              <p className="mt-0.5 text-[9px] text-slate-500">AI semantic rank</p>
+              <p className="text-[10.5px] font-semibold leading-tight tabular-nums">{match}% Match Rate</p>
+              <p className="mt-0.5 text-[8.5px] text-slate-500">AI semantic rank</p>
             </div>
           </motion.div>
 
@@ -176,19 +185,19 @@ export default function ResumeUpload() {
             animate={{ y: [0, 4, 0] }}
             transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
             whileHover={{ scale: 1.06 }}
-            className="absolute bottom-5 right-2 z-20 hidden cursor-default items-center gap-2 rounded-xl border border-slate-100 bg-white px-3 py-2 text-left shadow-soft sm:flex md:-right-8 lg:-right-10"
+            className="absolute bottom-10 z-20 hidden cursor-default items-center gap-2 rounded-xl border border-slate-100 bg-white px-2.5 py-1.5 text-left shadow-soft sm:-right-9 sm:flex"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-lg border border-orange-200 bg-orange-50 text-orange-500">
-              <Lock size={12} />
+            <span className="grid h-7 w-7 place-items-center rounded-lg border border-orange-200 bg-orange-50 text-orange-500">
+              <Lock size={11} />
             </span>
             <div>
-              <p className="text-[11px] font-semibold leading-tight">ATS Compliant</p>
-              <p className="mt-0.5 text-[9px] text-slate-500">Standardized parser</p>
+              <p className="text-[10.5px] font-semibold leading-tight">ATS Compliant</p>
+              <p className="mt-0.5 text-[8.5px] text-slate-500">Standardized parser</p>
             </div>
           </motion.div>
 
           {/* main card */}
-          <div className="rounded-[26px] bg-white/90 p-[clamp(8px,1.4vh,16px)] shadow-[0_20px_55px_-20px_rgba(30,64,175,.25)] backdrop-blur-xl sm:rounded-[28px]">
+          <div className="rounded-[26px] bg-white/80 p-[clamp(8px,1.4vh,14px)] shadow-[0_20px_55px_-20px_rgba(30,64,175,.25)] backdrop-blur-xl">
             {/* drop zone */}
             <div
               onDragOver={(e) => {
@@ -202,12 +211,18 @@ export default function ResumeUpload() {
                 pick(e.dataTransfer.files?.[0]);
               }}
               onMouseMove={onSpot}
-              className={`group relative overflow-hidden rounded-[20px] border-2 border-dashed px-4 py-[clamp(12px,2.2vh,24px)] text-center transition-all duration-300 sm:px-6 ${
+              className={`group relative overflow-hidden rounded-[20px] border border-dashed px-4 py-[clamp(14px,2.6vh,26px)] text-center transition-all duration-300 sm:px-6 ${
                 drag
                   ? 'scale-[1.015] border-brand bg-blue-50 shadow-[0_0_0_6px_rgba(0,149,255,.12)]'
-                  : 'border-indigo-200 bg-[#fafbff] hover:border-brand/60'
+                  : 'border-indigo-200 bg-[#f8f9ff] hover:border-brand/60'
               }`}
             >
+              {/* corner brackets */}
+              <span aria-hidden="true" className="pointer-events-none absolute left-0 top-0 h-4 w-4 rounded-tl-[20px] border-l-2 border-t-2 border-indigo-300" />
+              <span aria-hidden="true" className="pointer-events-none absolute right-0 top-0 h-4 w-4 rounded-tr-[20px] border-r-2 border-t-2 border-indigo-300" />
+              <span aria-hidden="true" className="pointer-events-none absolute bottom-0 left-0 h-4 w-4 rounded-bl-[20px] border-b-2 border-l-2 border-indigo-300" />
+              <span aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 h-4 w-4 rounded-br-[20px] border-b-2 border-r-2 border-indigo-300" />
+
               {/* cursor spotlight */}
               <div
                 aria-hidden="true"
@@ -220,16 +235,16 @@ export default function ResumeUpload() {
                 <motion.div
                   animate={drag ? { y: -6, scale: 1.18, rotate: -6 } : { y: [0, -3, 0], scale: 1, rotate: 0 }}
                   transition={drag ? { type: 'spring', stiffness: 300, damping: 14 } : { duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                  className="mx-auto grid h-[clamp(36px,5.2vh,46px)] w-[clamp(36px,5.2vh,46px)] place-items-center rounded-xl border border-blue-100 bg-blue-50 text-brand"
+                  className="mx-auto grid h-[clamp(32px,4.6vh,40px)] w-[clamp(32px,4.6vh,40px)] place-items-center rounded-xl border border-blue-100 bg-blue-50 text-brand"
                 >
-                  <FileText size={20} />
+                  <FileText size={18} />
                 </motion.div>
 
-                <h3 className="mt-[clamp(6px,1.2vh,12px)] text-[clamp(19px,3vh,24px)] font-bold leading-tight text-[#0B1020]">
+                <h3 className="mt-[clamp(6px,1.2vh,12px)] text-[clamp(18px,2.8vh,22px)] font-bold leading-tight text-[#0B1020]">
                   {drag ? 'Drop it here!' : 'Upload your resume'}
                 </h3>
 
-                <p className="mx-auto mt-1.5 max-w-[600px] text-[12px] leading-[18px] text-slate-500 sm:text-[13px]">
+                <p className="mx-auto mt-1.5 max-w-[340px] text-[11.5px] leading-[17px] text-slate-500 sm:text-[12px]">
                   PDF, DOC, or DOCX · Up to 10MB · We&apos;ll use it to understand your skills and experience.
                 </p>
 
@@ -238,14 +253,14 @@ export default function ResumeUpload() {
                 <Button
                   size="pill"
                   onClick={() => input.current?.click()}
-                  className="btn-signup mt-[clamp(8px,1.6vh,16px)] !h-[40px] px-7 text-[12px]"
+                  className="btn-signup mt-[clamp(10px,1.8vh,16px)] !h-[36px] px-6 text-[12px]"
                 >
                   {file ? 'Choose another' : 'Upload resume'}
                   <ArrowUp size={13} />
                 </Button>
 
                 {/* status slot (fixed min-height so the layout never jumps) */}
-                <div className="mx-auto mt-[clamp(6px,1.2vh,12px)] flex min-h-[60px] w-full max-w-[400px] flex-col items-center justify-center">
+                <div className="mx-auto mt-[clamp(8px,1.4vh,12px)] flex min-h-[56px] w-full max-w-[300px] flex-col items-center justify-center">
                   <AnimatePresence mode="wait" initial={false}>
                     {file ? (
                       <motion.div
@@ -307,39 +322,44 @@ export default function ResumeUpload() {
           </div>
         </motion.div>
 
-        {/* ───────── pipeline ───────── */}
-        <div className="mx-auto mt-[clamp(10px,2.2vh,24px)] grid w-full max-w-[1050px] shrink-0 grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4 lg:gap-3">
+        {/* ───────── pipeline (cards joined by short connector lines on lg+) ───────── */}
+        <div className="mx-auto mt-[clamp(14px,2.8vh,28px)] grid w-full max-w-[640px] shrink-0 grid-cols-2 gap-2.5 lg:flex lg:items-stretch lg:gap-0">
           {PIPELINE.map((item, i) => {
             const s = cardState(i);
             return (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.15 }}
-                transition={{ duration: 0.45, delay: i * 0.06 }}
-                whileHover={{ y: -3 }}
-                className={`flex min-h-[60px] items-center gap-2.5 rounded-2xl border bg-white/90 px-3 py-2 text-left shadow-soft transition-[box-shadow,border-color,opacity] duration-300 hover:shadow-[0_12px_30px_rgba(30,64,175,.10)] ${
-                  s === 'active' ? 'border-brand shadow-[0_0_0_4px_rgba(0,149,255,.12)]' : s === 'done' ? 'border-emerald-200' : 'border-slate-100'
-                } ${s === 'pending' ? 'opacity-55' : 'opacity-100'}`}
-              >
-                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg border ${s === 'pending' ? 'border-slate-200 bg-slate-50 text-slate-400' : ICON_TONE[item.icon]}`}>
-                  <motion.span
-                    key={s}
-                    initial={s === 'done' ? { scale: 0, rotate: -90 } : false}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 16 }}
-                    className="grid place-items-center"
-                  >
-                    {s === 'active' ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
-                  </motion.span>
-                </span>
+              <Fragment key={item.title}>
+                {i > 0 && <span aria-hidden="true" className="hidden h-px w-2.5 shrink-0 self-center bg-indigo-200/80 lg:block" />}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.15 }}
+                  transition={{ duration: 0.45, delay: i * 0.06 }}
+                  whileHover={{ y: -3 }}
+                  className={`flex min-h-[54px] min-w-0 items-center gap-2 rounded-xl border bg-white/90 px-2.5 py-2 text-left shadow-soft transition-[box-shadow,border-color,opacity] duration-300 hover:shadow-[0_12px_30px_rgba(30,64,175,.10)] lg:flex-1 ${
+                    s === 'active' ? 'border-brand shadow-[0_0_0_4px_rgba(0,149,255,.12)]' : s === 'done' ? 'border-emerald-200' : 'border-slate-100'
+                  } ${s === 'pending' ? 'opacity-55' : 'opacity-100'}`}
+                >
+                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg border ${s === 'pending' ? 'border-slate-200 bg-slate-50 text-slate-400' : ICON_TONE[item.icon]}`}>
+                    <motion.span
+                      key={s}
+                      initial={s === 'done' ? { scale: 0, rotate: -90 } : false}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 16 }}
+                      className="grid place-items-center"
+                    >
+                      {s === 'active' ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+                    </motion.span>
+                  </span>
 
-                <div className="min-w-0">
-                  <p className="text-[11.5px] font-semibold leading-tight text-ink">{item.title}</p>
-                  <p className={`mt-0.5 text-[9px] leading-tight ${item.subTone}`}>{item.sub}</p>
-                </div>
-              </motion.div>
+                  <div className="min-w-0">
+                    <p className="text-[10.5px] font-semibold leading-tight text-ink">{item.title}</p>
+                    <p className={`mt-0.5 flex items-center gap-1 text-[8.5px] leading-tight ${item.subTone}`}>
+                      {i === 0 && <span className="h-1 w-1 rounded-full bg-emerald-500" />}
+                      {item.sub}
+                    </p>
+                  </div>
+                </motion.div>
+              </Fragment>
             );
           })}
         </div>

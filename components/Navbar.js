@@ -44,11 +44,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 transition-all ${scrolled || open ? 'bg-white/90 shadow-soft backdrop-blur-md' : 'bg-transparent'}`}>
-      {/* bar: flex below lg (logo + hamburger), 3-column grid from lg so the links can never collide with logo or buttons */}
+    <header
+      // was mb-3 sm:mb-4 lg:mb-6 — the lg:mb-6 was adding unnecessary extra
+      // space on top of Hero's own vertical-centering gap at 1440px.
+      // Now a small, consistent gap at every breakpoint.
+      className={`sticky top-0 z-50 mb-2 sm:mb-3 transition-all ${
+        scrolled || open ? 'bg-white/90 shadow-soft backdrop-blur-md' : 'bg-transparent'
+      }`}
+    >
       <div
         ref={bar}
-        className="mx-auto flex h-[64px] w-full max-w-[1440px] items-center justify-between gap-4 px-5 sm:h-[76px] sm:px-8 lg:grid lg:grid-cols-[1fr_auto_1fr] xl:px-[100px]"
+        className="container-x flex h-[64px] items-center justify-between gap-4 sm:h-[72px] md:h-[76px] lg:grid lg:h-[80px] lg:grid-cols-[1fr_auto_1fr]"
       >
         <Link href="/" aria-label="CampusPe home" className="shrink-0 justify-self-start rounded-lg transition hover:opacity-80 active:scale-95">
           <img
@@ -58,13 +64,13 @@ export default function Navbar() {
           />
         </Link>
 
-        {/* desktop links */}
+        {/* desktop links — underline-on-hover removed, just a clean color shift now */}
         <nav aria-label="Primary" className="hidden items-center gap-6 lg:flex xl:gap-10 2xl:gap-12">
           {NAV_LINKS.map((l) => (
             <a
               key={l.label}
               href={l.href}
-              className="relative whitespace-nowrap py-1 text-[15px] font-medium text-ink transition-colors hover:text-brand after:absolute after:-bottom-0.5 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded after:bg-brand after:transition-transform hover:after:scale-x-100 focus-visible:after:scale-x-100 xl:text-[16px]"
+              className="whitespace-nowrap py-1 text-[15px] font-medium text-ink transition-colors duration-200 hover:text-brand xl:text-[16px]"
             >
               {l.label}
             </a>
@@ -100,7 +106,7 @@ export default function Navbar() {
       {open && (
         <div
           id="mobile-menu"
-          className="max-h-[calc(100svh-var(--nav-h,64px))] animate-fadeUp overflow-y-auto border-t border-slate-100 bg-white px-5 pb-5 sm:px-8 lg:hidden"
+          className="container-x max-h-[calc(100svh-var(--nav-h,64px))] animate-fadeUp overflow-y-auto border-t border-slate-100 bg-white pb-5 lg:hidden"
         >
           <nav aria-label="Mobile" className="flex flex-col">
             {NAV_LINKS.map((l) => (

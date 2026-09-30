@@ -44,7 +44,11 @@ export default function Discovery() {
   const list = (tab === 'All' ? FEED : FEED.filter((f) => f.cat === tab)).slice(0, 3);
   return (
     <section id="discovery" className="relative scroll-mt-20 bg-gradient-to-b from-white to-[#f6f9ff] pb-16 pt-10">
-      <div className="container-x grid min-w-0 items-center gap-12 xl:grid-cols-[minmax(0,540px)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
+      {/* xl is where the 540px text column + feed card genuinely have room to sit side by side;
+          below that (tablet/mobile) they stack, which keeps the feed card readable instead of
+          squeezing it into ~300px. gap-10/sm:gap-12 tightens the stacked vertical rhythm on
+          small screens where gap-12/gap-14/gap-20 previously left an oversized empty band. */}
+      <div className="container-x grid min-w-0 items-center gap-10 sm:gap-12 xl:grid-cols-[minmax(0,540px)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
         <Reveal className="min-w-0">
         <div>
           <SectionBadge>01 • Opportunity Discovery</SectionBadge>

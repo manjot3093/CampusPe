@@ -10,16 +10,70 @@ body { @apply font-sans text-ink antialiased bg-white overflow-x-hidden; }
 :focus-visible { outline: 2px solid #0095FF; outline-offset: 3px; border-radius: 8px; }
 
 @layer components {
-  .container-x { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-[100px]; }
+  /*
+   * Single source of truth for horizontal alignment across the entire site.
+   * - max-w-[1440px] + mx-auto: content stays centered and stops growing past
+   *   1440px, so 1600px/1920px/2000px screens get equal, growing whitespace
+   *   on both sides instead of the layout stretching edge-to-edge.
+   * - padding-inline via clamp(): fluid, no breakpoint jumps —
+   *   16px at 320px  →  ~38px at 768px  →  ~64px at 1280px  →  100px cap at 2000px.
+   * Every major section (Navbar, Hero, Discovery, AppShowcase, ResumeUpload,
+   * DownloadSection, Footer) uses this exact class, so their left/right edges
+   * always line up with each other at any viewport width.
+   */
+  .container-x { @apply mx-auto w-full max-w-[1440px] px-[clamp(16px,5vw,100px)]; }
   .pill-tag { @apply inline-flex items-center rounded-full text-[11px] font-medium px-2.5 py-1 leading-none; }
   .section-bg { background: linear-gradient(180deg,#f8faff 0%,#f6f7fe 100%); }
+
+  /*
+   * Shared, low-intensity background washes. One definition, reused wherever a
+   * section previously had its own hand-tuned multi-stop radial-gradient —
+   * keeps the "aurora" look consistent and subtle instead of getting more
+   * saturated/visible on wider screens.
+   *
+   * Opacity values roughly halved again from the previous pass so the tint
+   * reads as a faint room-light wash rather than a visible colored glow
+   * (used in ResumeUpload, AppShowcase and Footer).
+   */
+  .bg-aurora {
+    background:
+      radial-gradient(circle at 18% 50%, rgba(186,230,253,.13), transparent 34%),
+      radial-gradient(circle at 84% 50%, rgba(221,214,254,.11), transparent 36%);
+  }
+  .bg-aurora-soft {
+    background: radial-gradient(ellipse at center, rgba(191,219,254,.11), transparent 72%);
+  }
+  .bg-aurora-footer {
+    background:
+      radial-gradient(ellipse at 12% 100%, rgba(59,130,246,.09), transparent 55%),
+      radial-gradient(ellipse at 88% 100%, rgba(99,102,241,.07), transparent 55%);
+  }
+
+  /*
+   * Hero wash — the visible coloured glow behind the Hero cards
+   * (lavender on the right, sky blue on the left, faint pink at the bottom).
+   * Deliberately stronger than .bg-aurora so it shows up like the design.
+   * Used only in Hero.js. Raise/lower the alpha values to tune intensity.
+   */
+  .bg-hero-wash {
+    background:
+      radial-gradient(ellipse 42% 38% at 86% 58%, rgba(196,181,253,.30), transparent 70%),
+      radial-gradient(ellipse 42% 38% at 10% 62%, rgba(147,197,253,.30), transparent 70%),
+      radial-gradient(ellipse 55% 30% at 50% 88%, rgba(251,207,232,.22), transparent 70%);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 .marquee-track:hover { animation-play-state: paused; }
 
-/* ───────── Hero cards: smooth animated gradient border on hover ───────── */
+/* ───────── Hero cards: animated gradient border on hover ─────────
+ * NOTE: Hero.js's ChoiceCard no longer applies the `choice-card` class (it now
+ * uses a plain hover:border-brand/60 state instead), so this block is currently
+ * unused. Left in place — harmless if unused — in case you want to re-enable
+ * the animated conic-gradient border by adding `choice-card` back to the card's
+ * className in Hero.js.
+ */
 @property --ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @keyframes spinAng { to { --ang: 360deg; } }
 
@@ -49,23 +103,26 @@ body { @apply font-sans text-ink antialiased bg-white overflow-x-hidden; }
   animation-play-state: running;
 }
 
-/* ───────── Sign Up button (add class="btn-signup") ───────── */
+/* ───────── Sign Up button (add class="btn-signup") ─────────
+ * Simplified from a 3-stop, hue-shifting (blue → teal) sweeping gradient down
+ * to a single-hue, two-stop gradient with a light hover brighten. Keeps the
+ * shimmer sweep + click pulse as tasteful micro-interactions without the
+ * heavier multi-color gradient motion.
+ */
 .btn-signup {
   position: relative;
   isolation: isolate;
   overflow: hidden;
   color: #fff;
-  background-image: linear-gradient(110deg, #0095FF 0%, #0077E6 50%, #06B79C 100%);
-  background-size: 200% 100%;
-  background-position: 0% 0;
-  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, background-position .5s ease;
+  background: linear-gradient(180deg, #0095FF 0%, #0077E6 100%);
+  transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, filter .25s ease;
 }
 .btn-signup::before {            /* shimmer sweep */
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.55) 50%, transparent 70%);
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%);
   transform: translateX(-120%);
   transition: transform .7s ease;
 }
@@ -83,13 +140,13 @@ body { @apply font-sans text-ink antialiased bg-white overflow-x-hidden; }
 }
 .btn-signup:hover {
   transform: translateY(-2px);
-  background-position: 100% 0;
-  box-shadow: 0 10px 24px -8px rgba(0,149,255,.6);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 24px -8px rgba(0,149,255,.55);
 }
 .btn-signup:hover::before { transform: translateX(120%); }
 .btn-signup:active {
   transform: translateY(0) scale(.95);
-  box-shadow: 0 3px 8px -3px rgba(0,149,255,.55);
+  box-shadow: 0 3px 8px -3px rgba(0,149,255,.5);
   transition-duration: .1s;
 }
 .btn-signup:active::after { animation: btnPulse .5s ease-out; }
@@ -98,22 +155,13 @@ body { @apply font-sans text-ink antialiased bg-white overflow-x-hidden; }
   100% { transform: translate(-50%,-50%) scale(14); opacity: 0; }
 }
 
-/* ───────── Sign In link/button (add class="btn-signin") ───────── */
+/* ───────── Sign In link/button (add class="btn-signin") ─────────
+ * The gradient underline (::after) has been removed; only the soft
+ * background tint + lift remain on hover. */
 .btn-signin {
   position: relative;
   border-radius: 9999px;
   transition: color .25s ease, background-color .25s ease, transform .2s cubic-bezier(.2,.8,.2,1);
 }
-.btn-signin::after {             /* underline grows from centre */
-  content: '';
-  position: absolute;
-  left: 50%; bottom: 2px;
-  height: 2px; width: 0;
-  border-radius: 2px;
-  background: linear-gradient(90deg, #0095FF, #06B79C);
-  transform: translateX(-50%);
-  transition: width .3s cubic-bezier(.2,.8,.2,1);
-}
 .btn-signin:hover { color: #0095FF; background-color: rgba(0,149,255,.07); transform: translateY(-1px); }
-.btn-signin:hover::after { width: 55%; }
 .btn-signin:active { transform: scale(.94); background-color: rgba(0,149,255,.14); transition-duration: .1s; }

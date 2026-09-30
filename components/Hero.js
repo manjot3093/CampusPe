@@ -44,7 +44,7 @@ function ChoiceCard({ icon, status, title, desc, items, cta, ctaIcon, onClick, i
   return (
     <article
       style={{ animationDelay: `${delay}ms` }}
-      className="choice-card group relative flex flex-col rounded-3xl border-2 border-[#BFE6FF] bg-white/95 px-6 pb-5 pt-5 shadow-card animate-fadeUp transition-all duration-500 ease-out hover:-translate-y-2 hover:border-transparent hover:shadow-[0_24px_50px_-14px_rgba(0,149,255,.35)] focus-within:-translate-y-2 focus-within:border-transparent"
+      className="group relative flex flex-col rounded-3xl border-2 border-[#BFE6FF] bg-white/95 px-6 pb-5 pt-5 shadow-card animate-fadeUp transition-all duration-500 ease-out hover:-translate-y-2 hover:border-brand/60 hover:shadow-[0_20px_46px_-16px_rgba(0,149,255,.32)] focus-within:-translate-y-2 focus-within:border-brand/60"
     >
       <div className="flex items-start justify-between">
         <span className="grid h-10 w-10 place-items-center rounded-full border border-blue-100 bg-blue-50 text-brand transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">{icon}</span>
@@ -56,7 +56,6 @@ function ChoiceCard({ icon, status, title, desc, items, cta, ctaIcon, onClick, i
         {items.map((t) => <li key={t} className="flex items-start gap-2.5">{checkIcon}<span>{t}</span></li>)}
       </ul>
       <div className="mt-auto pt-4" />
-      {/* illustrations are clipped in their own wrapper so the animated border can sit outside the card */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[22px]">{illus}</div>
       <Button onClick={onClick} className="relative z-10 h-[40px] w-full text-[14px]">
         {cta} {ctaIcon}
@@ -71,7 +70,6 @@ function Notify({ className = '', style, children }) {
 
 export default function Hero() {
   const ref = useRef(null);
-  // subtle pointer parallax: each [data-depth] element drifts with the cursor
   const onMove = (e) => {
     if (!ref.current) return;
     const r = ref.current.getBoundingClientRect();
@@ -85,15 +83,16 @@ export default function Hero() {
   const onLeave = () => ref.current?.querySelectorAll('[data-depth]').forEach((el) => (el.style.transform = ''));
 
   return (
-    // md+: section fills exactly the space under the navbar (set --nav-h in globals.css), content is centred and scales with viewport height
     <section
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
-      className="relative flex items-center pb-4 pt-1 md:min-h-[calc(100svh-var(--nav-h,72px))]"
+      className="relative isolate pb-4 pt-3 sm:pt-4 md:min-h-[calc(100svh-var(--nav-h,72px))] md:pt-8 lg:pt-10"
     >
+      {/* soft coloured wash behind the cards (defined in globals.css) */}
+      <div aria-hidden className="bg-hero-wash pointer-events-none absolute inset-x-0 -top-10 bottom-0 -z-10" />
+
       <div className="container-x relative w-full text-center">
-        {/* ── header block (floating notifications are anchored to it) ── */}
         <div className="relative">
           <div data-depth="-18" className="absolute left-1/2 top-[6px] ml-[-560px] hidden transition-transform duration-300 ease-out xl:block">
             <Notify className="w-[196px] animate-float-slow text-left transition-transform hover:scale-105">
@@ -119,7 +118,6 @@ export default function Hero() {
           <p className="mx-auto mt-[clamp(6px,1.5vh,16px)] max-w-[680px] text-[clamp(15px,2.4vh,20px)] leading-snug text-slate-600">One platform connecting students, colleges & employers — faster.</p>
         </div>
 
-        {/* ── "What are you looking for?" row (chips are anchored to it) ── */}
         <div className="relative mt-[clamp(10px,2.2vh,24px)] flex items-center justify-center gap-6 text-brand">
           <Sparkles className="hidden animate-pulseDot sm:block" size={22} />
           <h2 className="text-[clamp(20px,3.4vh,28px)] font-medium">What are you looking for?</h2>
@@ -143,7 +141,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* compact versions below xl */}
         <div className="mt-4 flex flex-wrap justify-center gap-3 xl:hidden">
           <span className="rounded-full border border-slate-100 bg-white px-4 py-2 text-[12.5px] font-medium shadow-soft transition-transform duration-200 hover:-translate-y-0.5">🔥 142 students matched today</span>
           <span className="rounded-full border border-slate-100 bg-white px-4 py-2 text-[12.5px] font-medium shadow-soft transition-transform duration-200 hover:-translate-y-0.5">💼 Radiant Info shortlisted 8 interns</span>
@@ -165,8 +162,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── cards ── */}
-        <div className="mx-auto mt-[clamp(16px,3.4vh,40px)] grid max-w-[1112px] gap-6 text-left md:grid-cols-3">
+        <div className="mx-auto mt-[clamp(16px,3.4vh,40px)] grid max-w-[1112px] grid-cols-1 gap-6 text-left sm:grid-cols-2 lg:grid-cols-3">
           <ChoiceCard delay={0} icon={<Building2 size={18} />} status="Coming Soon" title="College" desc="Explore colleges, courses, fees, placements & more" items={['Search by course, location, fees', 'Connect directly with colleges', 'Improve student placements']} cta="Join Waitlist" ctaIcon={<Bell size={14} />} onClick={() => openModal({ type: 'waitlist', who: 'College' })} illus={<IllusCollege />} />
           <ChoiceCard delay={100} icon={<GraduationCap size={18} />} status="Available Now" title="I'm Looking for a Job" desc="Upload your resume. We'll find jobs that fit you." items={['Jobs from 1000+ sources', 'AI powered matching', 'WhatsApp & email alerts']} checkIcon={LIST_ICON_RED} cta="Explore Jobs" ctaIcon={<ArrowRight size={15} />} onClick={() => scrollToId('upload')} illus={<IllusResume />} />
           <ChoiceCard delay={200} icon={<Briefcase size={18} />} status="Coming Soon" title="I'm Hiring" desc="Connect with colleges and find candidates — from students to graduates." items={['Connect directly with colleges', 'Find the right candidates', 'Simplify your hiring']} cta="Join Waitlist" ctaIcon={<Bell size={14} />} onClick={() => openModal({ type: 'waitlist', who: 'Hiring' })} illus={<IllusHiring />} />

@@ -3,7 +3,10 @@ import Reveal from './ui/Reveal';
 export default function DownloadSection() {
   return (
     <section id="download">
-      <div className="relative mx-auto grid max-w-[1440px] items-center gap-8 overflow-hidden rounded-b-[40px] bg-gradient-to-br from-[#eaf4ff] via-white to-[#f7effe] px-6 py-12 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-[100px] lg:py-[16px]">
+      {/* now uses .container-x (max-w-1440 + fluid clamp padding) instead of its own
+          hand-rolled max-w-[1440px]/px-6/sm:px-10/lg:px-[100px] combo, so this section's
+          left/right edges line up exactly with Hero, Discovery, Footer, etc. at every width */}
+      <div className="container-x relative grid items-center gap-8 overflow-hidden rounded-b-[40px] bg-gradient-to-br from-[#eaf4ff] via-white to-[#f7effe] py-12 lg:grid-cols-[1.05fr_0.95fr] lg:py-[16px]">
         <Reveal><div>
           <h2 className="font-display text-[30px] font-bold text-brand sm:text-[34px]">Download App Now</h2>
           <p className="mt-6 max-w-[560px] text-[15px] leading-[22px] text-slate-600">Elevate your academic journey with Campuspe, the all-in-one digital ecosystem designed to bridge the gap between education and industry. Whether you’re a student seeking your next big internship, a college looking to empower your cohort, or a company scouting for top-tier talent, Campuspe streamlines the connection.Your career doesn't start at graduation—it starts here.</p>
